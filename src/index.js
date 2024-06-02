@@ -1,4 +1,3 @@
-const data = require('../resources/data.json')
 const cp = require('child_process')
 const moduleName = `${__dirname}/worker.js`
 

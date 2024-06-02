@@ -1,8 +1,8 @@
-const {v1} = require('uuid')
+const data = require('../resources/data.json')
 const querystring = require('querystring')
 const {join} = require('path')
 
-const puppeteer = require('puppeteer')
+const {Cluster} = require('puppeteer-cluster')
 
 const BASE_URL = "https://erickwendel.github.io/business-card-template/index.html"
 
@@ -43,11 +43,20 @@ async function render({finalURI,name }) {
 async function main(message) { 
     const pid = process.pid
     console.log(`${pid} got a message`, message.name)
-    const qs = createQueryString(message)
-    const finalURI = `${BASE_URL}?${qs}`
+    
 
     try {
-        await render({finalURI, name: message.name})
+        const cluster = await Cluster.launch({
+            concurrency: Cluster.CONCURRENCY_CONTEXT,
+            maxConcurrency:10
+        })
+        await cluster.task(render)
+
+        for(const item of data) {
+            const qs = createQueryString(message)
+            const finalURI = `${BASE_URL}?${qs}`
+            await cluster.queue({finalURI, name: item.name})
+        }
         process.send(`${pid} has finished!`)
     } catch (error) {
         process.send(`${pid} has broken! ${error.stack}`)
