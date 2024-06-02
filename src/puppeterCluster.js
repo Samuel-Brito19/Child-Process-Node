@@ -1,5 +1,6 @@
 const data = require('../resources/data.json')
 const querystring = require('querystring')
+const { v1 } = require('uuid')
 const {join} = require('path')
 
 const {Cluster} = require('puppeteer-cluster')
@@ -38,13 +39,10 @@ async function render({page, data:{finalURI,name} }) {
 }
 
 async function main() { 
-    const pid = process.pid
     
-
-    try {
         const cluster = await Cluster.launch({
             concurrency: Cluster.CONCURRENCY_CONTEXT,
-            maxConcurrency:10
+            maxConcurrency:10,
         })
         await cluster.task(render)
 
@@ -55,10 +53,7 @@ async function main() {
         }
         await cluster.idle()
         await cluster.close()
-        process.send(`${pid} has finished!`)
-    } catch (error) {
-        console.error(`${pid} has broken! ${error.stack}`)
-    }
+        
 }
 
 main()

@@ -40,14 +40,14 @@ async function render({finalURI,name }) {
     await browser.close()
 }
 
-async function main(message) { 
+async function main(data) { 
     const pid = process.pid
-    console.log(`${pid} got a message`, message.name)
-    const qs = createQueryString(message)
+    console.log(`${pid} got a message ${data.name}`)
+    const qs = createQueryString(data)
     const finalURI = `${BASE_URL}?${qs}`
 
     try {
-        await render({finalURI, name: message.name})
+        await render({finalURI, name: data.name})
         process.send(`${pid} has finished!`)
     } catch (error) {
         process.send(`${pid} has broken! ${error.stack}`)
