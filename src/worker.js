@@ -1,5 +1,5 @@
 async function main(message) {
-    const pic = process.pid
+    const pid = process.pid
     console.log(`${pid} got a message`, message.name)
 }
 

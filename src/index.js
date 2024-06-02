@@ -1,11 +1,20 @@
-const data = require('./../resources/data.json')
-const cp = require("child_process")
-const modulePath = `${__dirname}/worker.js`
+const data = require('../resources/data.json')
+const cp = require('child_process')
+const moduleName = `${__dirname}/worker.js`
 
+
+;
 (async function main() {
-    for(const iten of data) {
-        const worker = cp.fork(modulePath, [])
-        worker.on("message", msg => console.log("message caught on parent", msg))
+    
+    for (const item of data) {
+        console.log('data', item.name)
+        const worker = cp.fork(moduleName, [])
+        
+        worker.on('message', msg => console.log(msg))
+        worker.on('error', msg => console.error('error!', msg))
+
+        worker.send(item);
     }
-}
-)()
+
+})();
+
