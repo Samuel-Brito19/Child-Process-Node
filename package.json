@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "rm -rf output && mkdir -p output && node src/index.js"
+    "start": "rm -rf output && mkdir -p output && node src/index.js",
+    "cluster": "rm -rf output && mkdir -p output && node src/puppeterCluster.js"
   },
   "keywords": [],
   "author": "",

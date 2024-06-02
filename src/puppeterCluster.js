@@ -22,12 +22,9 @@ function createQueryString(data) {
     return qs
 }
 
-async function render({finalURI,name }) {
+async function render({page, data:{finalURI,name} }) {
     const output = join(__dirname, `./../output/${name}-${v1()}.pdf`)
-    const browser = await puppeteer.launch({
-        // headless: false
-    })
-    const page = await browser.newPage()
+    
     await page.goto(finalURI, {waitUntil: 'networkidle2'})
 
     await page.pdf({
@@ -37,12 +34,11 @@ async function render({finalURI,name }) {
         printBackground: true
     })
 
-    await browser.close()
+    console.log('ended', output)
 }
 
-async function main(message) { 
+async function main() { 
     const pid = process.pid
-    console.log(`${pid} got a message`, message.name)
     
 
     try {
@@ -53,14 +49,16 @@ async function main(message) {
         await cluster.task(render)
 
         for(const item of data) {
-            const qs = createQueryString(message)
+            const qs = createQueryString(item)
             const finalURI = `${BASE_URL}?${qs}`
             await cluster.queue({finalURI, name: item.name})
         }
+        await cluster.idle()
+        await cluster.close()
         process.send(`${pid} has finished!`)
     } catch (error) {
-        process.send(`${pid} has broken! ${error.stack}`)
+        console.error(`${pid} has broken! ${error.stack}`)
     }
 }
 
-process.once("message", main)
+main()
